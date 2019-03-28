@@ -9,7 +9,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PracticalTest01Var03SecondaryActivity"></activity>
         <activity android:name=".PracticalTest01Var03MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -17,6 +16,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity            android:name=".PracticalTest01Var03SecondaryActivity" >
+            <intent-filter>
+                <action android:name=".PracticalTest01Var03SecondaryActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <service
+            android:name=".PracticalTest01Var03Service"
+            android:enabled="true"
+            android:exported="false" />
     </application>
+
 
 </manifest>

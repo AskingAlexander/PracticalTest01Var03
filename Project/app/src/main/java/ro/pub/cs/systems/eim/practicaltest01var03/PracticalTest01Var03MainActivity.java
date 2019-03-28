@@ -1,7 +1,13 @@
 package ro.pub.cs.systems.eim.practicaltest01var03;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -11,6 +17,8 @@ import android.widget.Toast;
 
 public class PracticalTest01Var03MainActivity extends AppCompatActivity {
 
+    private final static int SECONDARY_ACTIVITY_REQUEST_CODE = 1;
+
     private EditText topEditText = null;
     private EditText bottomEditText = null;
     private Button topButton = null;
@@ -19,6 +27,14 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
     private CheckBox secondCheck = null;
     private TextView infoDisplay = null;
     private  PracticalTest01Var03MainActivity activity;
+    private MessageBroadcastReceiver messageBroadcastReceiver = new MessageBroadcastReceiver();
+    private class MessageBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d("[Message]", intent.getStringExtra("message"));
+        }
+    }
+    private IntentFilter intentFilter = new IntentFilter();
 
 
     @Override
@@ -39,6 +55,10 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
 
         infoDisplay= (TextView) findViewById(R.id.info_display);
 
+        for (int index = 0; index < Constants.actionTypes.length; index++) {
+            intentFilter.addAction(Constants.actionTypes[index]);
+        }
+
 
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("topEditText")) {
@@ -55,6 +75,33 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
             topEditText.setText("");
             bottomEditText.setText("");
         }
+
+        topButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // your handler code here
+                Intent intent = new Intent(getApplicationContext(), PracticalTest01Var03SecondaryActivity.class);
+
+                intent.putExtra("topEditText", topEditText.getText().toString());
+                intent.putExtra("bottomEditText", bottomButton.getText().toString());
+                startActivityForResult(intent, SECONDARY_ACTIVITY_REQUEST_CODE);
+            }
+        });
+
+        bottomButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // your handler code here
+                if (firstCheck.isChecked()
+                        && secondCheck.isChecked()
+                        && (!topEditText.getText().toString().isEmpty())
+                        && (!secondCheck.getText().toString().isEmpty())) {
+                    Intent intent = new Intent(getApplicationContext(), PracticalTest01Var03Service.class);
+                    intent.putExtra("topEditText", topEditText.getText().toString().isEmpty());
+                    intent.putExtra("bottomEditText", bottomEditText.getText().toString().isEmpty());
+                    getApplicationContext().startService(intent);
+                    int serviceStatus = Constants.SERVICE_STARTED;
+                }
+            }
+        });
 
         firstCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
@@ -126,5 +173,29 @@ public class PracticalTest01Var03MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        if (requestCode == SECONDARY_ACTIVITY_REQUEST_CODE) {
+            Toast.makeText(this, "The activity returned with result " + resultCode, Toast.LENGTH_LONG).show();
+        }
+    }
 
+    @Override
+    protected void onDestroy() {
+        Intent intent = new Intent(this, PracticalTest01Var03Service.class);
+        stopService(intent);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(messageBroadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(messageBroadcastReceiver);
+        super.onPause();
+    }
 }
