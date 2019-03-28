@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">PracticalTest01Var03</string>
+    <string name="navigate_to_second">NAVIGATE TO SECONDARY ACTIVITY</string>
+    <string name="add_name">Please enter your name</string>
+    <string name="add_group">Please enter group</string>
+    <string name="display_information">DISPLAY INFORMATION</string>
 </resources>
